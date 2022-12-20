@@ -1,0 +1,5 @@
+build/
+*.lst
+*.generated.*
+.vscode
+_h/

@@ -1,0 +1,35 @@
+#! /bin/bash
+
+# sprites
+SPRITES=$(aseprite -b --list-layers $1 | grep 'SP-')
+echo "Found sprites:"
+echo "$SPRITES" | xargs -I % echo "- %"
+echo "$SPRITES" | xargs -I % echo "--layer '%'" | xargs -J % aseprite -b \
+  --data ./assets/sprites.generated.json \
+  --format json-array \
+  --sheet ./assets/sprites.generated.bmp \
+  --sheet-type packed \
+  --split-layers \
+  --ignore-empty \
+  --merge-duplicates \
+  --trim-by-grid \
+  --filename-format "{layer}.{frame}" \
+  % $1
+
+echo
+
+# background tiles
+TILES=$(aseprite -b --list-layers $1 | grep 'BG-\|FG-')
+echo "Found background / foreground tiles:"
+echo "$TILES" | xargs -I % echo "- %"
+echo "$TILES" | xargs -I % echo "--layer '%'" | xargs -J % aseprite -b \
+  --data ./assets/background.generated.json \
+  --format json-array \
+  --sheet ./assets/background.generated.bmp \
+  --sheet-type packed \
+  --split-grid \
+  --split-layers \
+  --oneframe \
+  --ignore-empty \
+  --filename-format "{layer}" \
+  % $1
