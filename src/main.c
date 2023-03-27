@@ -55,7 +55,7 @@ void show_splash(void)
   fade_out(retcon_palettes_bin, &retcon_palettes_bin[16], retcon_palettes_bin_bank);
   clear_screen(" ");
   wait(2);
-  SMS_mapROMBank(retcon_tiles_bin_bank);
+  SMS_mapROMBank(retcon_palettes_bin_bank);
   SMS_printatXY(5, 11, "Undeveloper_ presents");
   fade_in(retcon_palettes_bin, &retcon_palettes_bin[16], retcon_palettes_bin_bank);
   wait(3);
@@ -72,10 +72,16 @@ void show_splash(void)
   SMS_mapROMBank(splash_upper_tiles_bin_bank);
   SMS_loadTiles(splash_upper_tiles_bin, 256, splash_upper_tiles_bin_size);
   SMS_mapROMBank(splash_tilemap_bin_bank);
-  SMS_loadTileMap(0, 0, splash_tilemap_bin, splash_tilemap_bin_size);
+  SMS_loadTileMap(0, 1, splash_tilemap_bin, splash_tilemap_bin_size);
+  SMS_setNextTileatLoc(0);
+  for (int i = 0; i < 32; i++)
+    SMS_setTile(10 | TILE_USE_SPRITE_PALETTE);
+  SMS_setNextTileatXY(0, 23);
+  for (int i = 0; i < 32; i++)
+    SMS_setTile(10 | TILE_USE_SPRITE_PALETTE);
   SMS_mapROMBank(splash_palette_bin_bank);
   fade_in(splash_palette_bin, NULL, 0);
-  wait(3);
+  wait(5);
   fade_out(splash_palette_bin, NULL, 0);
   wait(1);
 }
