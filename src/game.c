@@ -160,7 +160,7 @@ inline void handle_input_arcade(unsigned int keys)
   if ((keys & (PORT_A_KEY_2 | PORT_A_KEY_1)) && bananas[0].p.oob)
   {
     // hide banana icon in arcade mode when throwing
-    if (game.mode == GAME_MODE_ARCADE) SMS_setTileatXY(10, 22, BLANK_TILE);
+    SMS_setTileatXY(10, 22, BLANK_TILE);
     projectile_launch_from(
       &bananas[0].p, 
       game.players[0].ms.x * SCALE, 
@@ -172,7 +172,7 @@ inline void handle_input_arcade(unsigned int keys)
   if ((keys & (PORT_B_KEY_2 | PORT_B_KEY_1)) && bananas[1].p.oob)
   {
     // hide banana icon in arcade mode when throwing
-    if (game.mode == GAME_MODE_ARCADE) SMS_setTileatXY(22, 22, BLANK_TILE);
+    SMS_setTileatXY(22, 22, BLANK_TILE);
     projectile_launch_from(
       &bananas[1].p, 
       (game.players[1].ms.x + 8) * SCALE, 
@@ -213,6 +213,9 @@ inline void handle_input_classic(unsigned int keys)
     }
     else if (setting && (keys & (PORT_A_KEY_2 | PORT_A_KEY_1)))
     {
+#ifdef USEPSGLIB
+    PSGSFXPlay(classic_throw_psg, SFX_CHANNEL2);
+#endif
       projectile_launch_from(
         &bananas[game.player_turn].p, 
         game.players[game.player_turn].ms.x * SCALE, 
@@ -530,6 +533,10 @@ void explode_banana(Banana *b)
     }
     if ((b->ms.y % 8) == 0) break;
   }
+#ifdef USEPSGLIB
+
+  PSGSFXPlay(classic_building_hit_psg, SFX_CHANNEL2);
+#endif
 }
 
 void do_scenery_collision_check(Banana *b)
@@ -572,11 +579,12 @@ void play_game(void)
   {
     SMS_waitForVBlank();
 #ifdef USEPSGLIB
-    if (!paused)
-    {
-      PSGFrame();
-      PSGSFXFrame();
-    }
+    SMS_saveROMBank();
+    SMS_mapROMBank(primates_psg_bank);
+    PSGFrame();
+    SMS_mapROMBank(classic_throw_psg_bank);
+    PSGSFXFrame();
+    SMS_restoreROMBank();
 #endif
     UNSAFE_SMS_copySpritestoSAT();
 
@@ -631,6 +639,9 @@ void play_game(void)
             game.players[j].is_exploding = true;
             explosion_occurring = true;
             game.players[(j+1)%2].score++;
+#ifdef USEPSGLIB
+            PSGSFXPlay(classic_celebrate_psg, SFX_CHANNEL2);
+#endif
           }
         }
         // if it didn't collide with a gorilla, it might have collided with a banana
@@ -681,8 +692,13 @@ void play_game(void)
       for (int i = 0; i < N_PLAYERS; i++)
       {
         // keep playing until the gorilla explosion animation has finished,
+        // and the sound effect has stopped (in classic mode)
         // then start a new point / game over
+#ifdef USEPSGLIB
+        if ((game.players[i].ms.current_frame == NULL) && ((game.mode == GAME_MODE_ARCADE) || (PSGSFXGetStatus() == PSG_STOPPED)))
+#else
         if (game.players[i].ms.current_frame == NULL)
+#endif
         {
           game.players[i].is_exploding = false;
           games_played++;
