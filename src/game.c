@@ -534,8 +534,8 @@ void explode_banana(Banana *b)
     if ((b->ms.y % 8) == 0) break;
   }
 #ifdef USEPSGLIB
-
-  PSGSFXPlay(classic_building_hit_psg, SFX_CHANNEL2);
+  if (game.mode == GAME_MODE_CLASSIC)
+    PSGSFXPlay(classic_building_hit_psg, SFX_CHANNEL2);
 #endif
 }
 
@@ -640,7 +640,8 @@ void play_game(void)
             explosion_occurring = true;
             game.players[(j+1)%2].score++;
 #ifdef USEPSGLIB
-            PSGSFXPlay(classic_celebrate_psg, SFX_CHANNEL2);
+            if (game.mode == GAME_MODE_CLASSIC)
+              PSGSFXPlay(classic_celebrate_psg, SFX_CHANNEL2);
 #endif
           }
         }
