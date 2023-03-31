@@ -399,14 +399,14 @@ void reset_level(void)
     else SMS_loadTiles(windometer_tiles + 8*32, WIND_TILE_FROM + 4, 32);
   }
 
-  if (game.mode == GAME_MODE_ARCADE)
+  for (int i = 0; i < N_PLAYERS; i++)
   {
-    for (int i = 0; i < N_PLAYERS; i++)
+    if (game.mode == GAME_MODE_ARCADE)
     {
       display_angle(i);
       display_power(i);
-      display_score(i);
     }
+    display_score(i);
   }
 
   SMS_initSprites();
