@@ -16,6 +16,7 @@
 #define COLLISION_NONE 0
 #define COLLISION_PLAYER 1
 #define COLLISION_BANANA 2
+#define COLLISION_SCENERY 4
 #define N_BANANAS 2
 #define N_METAS (N_BANANAS + N_PLAYERS)
 #define KEY_HOLD_DELAY 20
@@ -609,22 +610,10 @@ void play_game(void)
 
     SMS_initSprites();
 
-    if (!COLLISION)
-    {
-      // physics
-      for (int i = 0; i < N_BANANAS; i++)
-        move_banana(&bananas[i]);
-
-      unsigned int keys = game.cpu_opponent ? input_read_keys_1player() : input_read_keys_2player();
-      if (game.mode == GAME_MODE_ARCADE)
-        handle_input_arcade(keys);
-      else
-        handle_input_classic(keys);
-    }
-    else
+    int collision_type = COLLISION_NONE;
+    if (COLLISION)
     {
       // collision detection
-      int collision_type = COLLISION_NONE;
       for (int i = 0; i < N_BANANAS; i++)
       {
         for (int j = 0; j < N_PLAYERS; j++)
@@ -671,9 +660,23 @@ void play_game(void)
           {
             bananas[i].is_exploding = true;
             explosion_occurring = true;
+            collision_type |= COLLISION_SCENERY;
           }
         }
       }
+    }
+
+    if (collision_type == COLLISION_NONE)
+    {
+      // physics
+      for (int i = 0; i < N_BANANAS; i++)
+        move_banana(&bananas[i]);
+
+      unsigned int keys = game.cpu_opponent ? input_read_keys_1player() : input_read_keys_2player();
+      if (game.mode == GAME_MODE_ARCADE)
+        handle_input_arcade(keys);
+      else
+        handle_input_classic(keys);
     }
 
     // keep players stable if screen is shaking
