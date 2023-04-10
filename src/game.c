@@ -158,7 +158,7 @@ inline void handle_input_arcade(unsigned int keys)
     else if (game.players[1].velocity > 0) game.players[1].velocity--;
     display_power(1);
   }
-  if ((keys & (PORT_A_KEY_2 | PORT_A_KEY_1)) && bananas[0].p.oob)
+  if ((keys & (PORT_A_KEY_2 | PORT_A_KEY_1)) && bananas[0].p.oob && (game.allow_death_throw || !game.players[0].is_exploding))
   {
     // hide banana icon in arcade mode when throwing
     SMS_setTileatXY(10, 22, BLANK_TILE);
@@ -170,7 +170,7 @@ inline void handle_input_arcade(unsigned int keys)
       game.players[0].velocity
     );
   }
-  if ((keys & (PORT_B_KEY_2 | PORT_B_KEY_1)) && bananas[1].p.oob)
+  if ((keys & (PORT_B_KEY_2 | PORT_B_KEY_1)) && bananas[1].p.oob && (game.allow_death_throw || !game.players[1].is_exploding))
   {
     // hide banana icon in arcade mode when throwing
     SMS_setTileatXY(22, 22, BLANK_TILE);
@@ -616,7 +616,7 @@ void play_game(void)
       // collision detection
       for (int i = 0; i < N_BANANAS; i++)
       {
-        for (int j = 0; j < N_PLAYERS; j++)
+        for (int j = 0; (j < N_PLAYERS) && !bananas[i].p.oob; j++)
         {
           if (!game.players[j].is_exploding && meta_collides(&bananas[i].ms, &game.players[j].ms))
           {
@@ -624,10 +624,18 @@ void play_game(void)
             meta_set_frame(&game.players[j].ms, &explosion_frame[0]);
             meta_hide(&bananas[i].ms);
             meta_move_to(&bananas[i].ms, 0, 0);
-            bananas[i].p.oob = true;
             game.players[j].is_exploding = true;
             explosion_occurring = true;
             game.players[(j+1)%2].score++;
+            if (!game.allow_death_point)
+            {
+              for (int k = 0; k < N_BANANAS; k++)
+                bananas[k].p.oob = true;
+            }
+            else
+            {
+              bananas[i].p.oob = true;
+            }
 #ifdef USEPSGLIB
             if (game.mode == GAME_MODE_CLASSIC)
               PSGSFXPlay(classic_celebrate_psg, SFX_CHANNEL2);

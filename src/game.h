@@ -34,6 +34,8 @@ typedef struct Game
   int player_turn; // for classic game only
   bool setting_angle; // for classic game only
   bool setting_power; // for classic game only
+  bool allow_death_throw; // option - for arcade game only
+  bool allow_death_point; // option - for arcade game only
 } Game;
 
 extern Game game;

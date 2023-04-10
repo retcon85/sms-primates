@@ -144,7 +144,7 @@ void show_main_menu(void)
   }
 
 
-  SMS_printatXY(0, 18, "    Total games to play?        ");
+  SMS_printatXY(0, 18, " Total games to play?           ");
   while (SMS_getKeysPressed());
 
   while (!(SMS_getKeysPressed() & (PORT_A_KEY_1 | PORT_B_KEY_1 | PORT_A_KEY_2 | PORT_B_KEY_2)))
@@ -155,7 +155,36 @@ void show_main_menu(void)
     else if ((game.points_limit > 1) && (SMS_getKeysPressed() & (PORT_A_KEY_DOWN | PORT_B_KEY_DOWN | PORT_A_KEY_LEFT | PORT_B_KEY_LEFT)))
       game.points_limit--;
 
-    print_dec2(25, 18, game.points_limit, ' ');
+    print_dec2(28, 18, game.points_limit, ' ');
+  }
+
+  if (game.mode == GAME_MODE_ARCADE)
+  {
+    SMS_printatXY(0, 19, " Both players can win point?    ");
+    while (SMS_getKeysPressed());
+
+    game.allow_death_point = true;
+    while (!(SMS_getKeysPressed() & (PORT_A_KEY_1 | PORT_B_KEY_1 | PORT_A_KEY_2 | PORT_B_KEY_2)))
+    {
+      wait_play_seed();
+      if (SMS_getKeysPressed() & (PORT_A_KEY_UP | PORT_B_KEY_UP | PORT_A_KEY_RIGHT | PORT_B_KEY_RIGHT | PORT_A_KEY_DOWN | PORT_B_KEY_DOWN | PORT_A_KEY_LEFT | PORT_B_KEY_LEFT))
+        game.allow_death_point = !game.allow_death_point;
+
+      SMS_printatXY(29, 19, game.allow_death_point ? "Y" : "N");
+    }
+
+    SMS_printatXY(0, 20, " Allow dying throw?             ");
+    while (SMS_getKeysPressed());
+
+    game.allow_death_throw = true;
+    while (!(SMS_getKeysPressed() & (PORT_A_KEY_1 | PORT_B_KEY_1 | PORT_A_KEY_2 | PORT_B_KEY_2)))
+    {
+      wait_play_seed();
+      if (SMS_getKeysPressed() & (PORT_A_KEY_UP | PORT_B_KEY_UP | PORT_A_KEY_RIGHT | PORT_B_KEY_RIGHT | PORT_A_KEY_DOWN | PORT_B_KEY_DOWN | PORT_A_KEY_LEFT | PORT_B_KEY_LEFT))
+        game.allow_death_throw = !game.allow_death_throw;
+
+      SMS_printatXY(29, 20, game.allow_death_throw ? "Y" : "N");
+    }
   }
 
 #ifdef USEPSGLIB
