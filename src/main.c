@@ -186,6 +186,37 @@ void show_main_menu(void)
       SMS_printatXY(29, 20, game.allow_death_throw ? "Y" : "N");
     }
   }
+  else
+  {
+    SMS_printatXY(0, 19, " Remember last throw?           ");
+    while (SMS_getKeysPressed());
+
+    game.remember_params = true;
+    while (!(SMS_getKeysPressed() & (PORT_A_KEY_1 | PORT_B_KEY_1 | PORT_A_KEY_2 | PORT_B_KEY_2)))
+    {
+      wait_play_seed();
+      if (SMS_getKeysPressed() & (PORT_A_KEY_UP | PORT_B_KEY_UP | PORT_A_KEY_RIGHT | PORT_B_KEY_RIGHT | PORT_A_KEY_DOWN | PORT_B_KEY_DOWN | PORT_A_KEY_LEFT | PORT_B_KEY_LEFT))
+        game.remember_params = !game.remember_params;
+
+      SMS_printatXY(29, 19, game.remember_params ? "Y" : "N");
+    }
+
+    if (!game.cpu_opponent)
+    {
+      game.share_controller = true;
+      SMS_printatXY(0, 20, " Share controller 1?            ");
+      while (SMS_getKeysPressed());
+
+      while (!(SMS_getKeysPressed() & (PORT_A_KEY_1 | PORT_B_KEY_1 | PORT_A_KEY_2 | PORT_B_KEY_2)))
+      {
+        wait_play_seed();
+        if (SMS_getKeysPressed() & (PORT_A_KEY_UP | PORT_B_KEY_UP | PORT_A_KEY_RIGHT | PORT_B_KEY_RIGHT | PORT_A_KEY_DOWN | PORT_B_KEY_DOWN | PORT_A_KEY_LEFT | PORT_B_KEY_LEFT))
+          game.share_controller = !game.share_controller;
+
+        SMS_printatXY(29, 20, game.share_controller ? "Y" : "N");
+      }
+    }
+  }
 
 #ifdef USEPSGLIB
   PSGSilenceChannels();

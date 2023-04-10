@@ -36,6 +36,8 @@ typedef struct Game
   bool setting_power; // for classic game only
   bool allow_death_throw; // option - for arcade game only
   bool allow_death_point; // option - for arcade game only
+  bool share_controller; // option - for classic game only
+  bool remember_params; // option - for classic game only
 } Game;
 
 extern Game game;

@@ -192,7 +192,7 @@ inline void handle_input_classic(unsigned int keys)
   game.setting_angle = true;
   
   // normalise keys pressed to player 0's keys for convenience
-  keys = (game.player_turn == 0 ? keys : keys >> 6) & 0x003f;
+  keys = ((game.share_controller || game.player_turn == 0) ? keys : keys >> 6) & 0x003f;
 
   if (game.setting_power)
   {
@@ -224,12 +224,15 @@ inline void handle_input_classic(unsigned int keys)
         (game.player_turn == 0 ? 0 : 270) + game.players[game.player_turn].angle, 
         game.players[game.player_turn].velocity
       );
-      game.players[game.player_turn].angle = 0;
-      game.players[game.player_turn].velocity = 0;
       clear_label_area();
       game.setting_angle = game.setting_power = false;
       game.player_turn = (game.player_turn + 1) % 2;
-      setting = false;
+      if (!game.remember_params)
+      {
+        setting = false;
+        game.players[game.player_turn].angle = 0;
+        game.players[game.player_turn].velocity = 0;
+      }
       return;
     }
     if (setting)
@@ -256,7 +259,8 @@ inline void handle_input_classic(unsigned int keys)
     else if (setting && (keys & (PORT_A_KEY_2 | PORT_A_KEY_1)))
     {
       game.setting_power = true;
-      setting = false;
+      if (!game.remember_params)
+        setting = false;
     }
     if (setting)
       display_angle(game.player_turn);
